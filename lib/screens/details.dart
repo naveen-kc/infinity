@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:infinity/helpers/localStorage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class Details extends StatefulWidget {
@@ -11,6 +15,36 @@ class Details extends StatefulWidget {
 class _DetailsState extends State<Details> {
   Map product={};
 
+
+  void addToCart()async{
+
+    LocalStorage local= LocalStorage();
+    List items=[];
+
+    SharedPreferences prefs= await SharedPreferences.getInstance();
+    String? data=prefs.getString('cart');
+    if(data==null){
+      items.add(product);
+      var s = json.encode(items);
+      local.putCart(s);
+    }
+    else if(data!.isNotEmpty){
+      var check=json.decode(data);
+      items=check;
+      items.add(product);
+      var s = json.encode(items);
+      local.putCart(s);
+
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.green,
+        content: Text(
+            'Added to cart successfully')));
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
@@ -20,9 +54,35 @@ class _DetailsState extends State<Details> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+        title: Text('Details',
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: Center(child:
+            TextButton(
+              style:  TextButton.styleFrom(
+        backgroundColor: Colors.white,
+        shadowColor: Colors.grey,
+        elevation: 5,
+      ),
+                onPressed:(){
+                  Navigator.pushNamed(context, "/cart");
+                },
+                child:Text('Cart',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20
+                  ),)),
+            ),
+          )
+        ],
+      ),
       body:SafeArea(
-
-      child: Stack(
+      child:Stack(
         children: [
           SingleChildScrollView(
             child: Column(
@@ -114,15 +174,19 @@ class _DetailsState extends State<Details> {
               ),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child:   ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.green),
-                        textStyle: MaterialStateProperty.all(
-                            const TextStyle(fontSize: 14, color: Colors.white))),
-                    onPressed: () {
+                child:   Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.green),
+                          textStyle: MaterialStateProperty.all(
+                              const TextStyle(fontSize: 14, color: Colors.white))),
+                      onPressed: ()async{
+                       addToCart();
 
-                    },
-                    child: const Text('Add to Cart')),
+                      },
+                      child: const Text('Add to Cart')),
+                ),
               ),
 
             ),

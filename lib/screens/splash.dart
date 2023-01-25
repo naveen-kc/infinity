@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Splash extends StatefulWidget {
   const Splash({Key? key}) : super(key: key);
@@ -12,12 +13,27 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
 
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pop(context, true);
-      Navigator.pushNamed(context, "/home");
-    });
+    checkSession();
 
     super.initState();
+  }
+
+
+  void checkSession()async{
+    SharedPreferences prefs=await SharedPreferences.getInstance();
+    if(prefs.getString("name")!=null){
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pop(context, true);
+        Navigator.pushNamed(context, "/home");
+      });
+    }else{
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pop(context, true);
+        Navigator.pushNamed(context, "/login");
+      });
+    }
+
+
   }
 
 

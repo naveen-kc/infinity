@@ -85,6 +85,11 @@ class _HomeState extends State<Home> {
           actions: [
             Center(child:
             TextButton(
+                style:  TextButton.styleFrom(
+                  backgroundColor: Colors.greenAccent,
+                  shadowColor: Colors.grey,
+                  elevation: 3,
+                ),
               onPressed:(){
                 Navigator.pushNamed(context, "/cart");
                  },
@@ -145,18 +150,21 @@ class _HomeState extends State<Home> {
                                 border: Border.all(color: Colors.grey,width: 0.5),
                                 borderRadius: BorderRadius.circular(10)
                               ),
-                              height: 110,
+
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SizedBox(
-                                    height: 100,
+                                    height: 90,
                                       width: 100,
                                       child: Image.network(prods[index]['image'])),
-                                  Text(prods[index]['title'],
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 3,
-                                  textAlign: TextAlign.center,),
+                                  SizedBox(
+                                    height: 40,
+                                    child: Text(prods[index]['title'],
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 3,
+                                    textAlign: TextAlign.center,),
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
                                     child: Row(
@@ -184,3 +192,4 @@ class _HomeState extends State<Home> {
          );
   }
 }
+

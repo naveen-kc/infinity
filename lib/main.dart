@@ -3,6 +3,7 @@ import 'package:infinity/screens/cart.dart';
 import 'package:infinity/screens/details.dart';
 import 'package:infinity/screens/home.dart';
 import 'package:infinity/screens/splash.dart';
+import 'package:infinity/screens/login.dart';
 
 void main() {
 
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => Home(),
         '/cart': (context) => Cart(),
         '/details': (context) => Details(),
+        '/login':(context)=>Login()
 
 
       },
