@@ -7,7 +7,6 @@ class AlertBox extends StatefulWidget {
   String description;
   String? value;
   String? yes;
-  String? no;
   final VoidCallback okay;
   final VoidCallback? cancel;
   Color? okColor;
@@ -20,7 +19,6 @@ class AlertBox extends StatefulWidget {
         required this.okay,
         this.cancel,
         this.value,
-        this.no,
         this.yes,
         this.okColor,
         this.cancelColor})
@@ -104,7 +102,7 @@ class _AppDialogState extends State<AlertBox> {
                     Navigator.of(context).pop();
 
                   },
-                  child:Text(widget.no!,
+                  child:Text('Cancel',
                     style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,

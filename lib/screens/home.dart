@@ -16,6 +16,9 @@ class _HomeState extends State<Home> {
   TextEditingController searchController = TextEditingController();
   bool loading=false;
   FocusNode _focus = FocusNode();
+  List catList = [];
+  bool selected = false;
+  bool showCat=false;
 
   @override
   void initState() {
@@ -25,8 +28,39 @@ class _HomeState extends State<Home> {
     super.initState();
   }
 
-  void _onFocusChange() {
+  void _onFocusChange() async{
   debugPrint("Focus: ${_focus.hasFocus.toString()}");
+
+
+  if(_focus.hasFocus){
+    var data = await Controller().getCategories();
+    setState(() {
+      catList=data;
+      showCat=true;
+    });
+  }else{
+    setState(() {
+      showCat=false;
+    });
+  }
+}
+
+void getProductsByCategory(String cat)async{
+
+  setState(() {
+    loading=true;
+  });
+  var data = await Controller().getByType(cat);
+
+  log("respoooooooo :" + data.toString());
+
+  setState(() {
+    prods = data;
+  });
+
+  setState(() {
+    loading=false;
+  });
 }
 
 
@@ -130,66 +164,109 @@ class _HomeState extends State<Home> {
                     valueColor: AlwaysStoppedAnimation(
                         Colors.green),
                     strokeWidth: 5.0))):
-              Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2),
-                      itemCount: prods.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                            onTap: (){
-                              Navigator.pushNamed(context, "/details",arguments: {'prod':prods[index]});
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: Colors.grey,width: 0.5),
-                                borderRadius: BorderRadius.circular(10)
-                              ),
+              Column(
+                children: [
 
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    height: 90,
-                                      width: 100,
-                                      child: Image.network(prods[index]['image'])),
-                                  SizedBox(
-                                    height: 40,
-                                    child: Text(prods[index]['title'],
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 3,
-                                    textAlign: TextAlign.center,),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
-                                    child: Row(
-                                      children: [
-                                        Text(prods[index]['rating']['rate'].toString(),
-                                          textAlign: TextAlign.center,),
-                                        Spacer(),
-                                        Text('₹ '+prods[index]['price'].toString(),
-                                          textAlign: TextAlign.center,style: TextStyle(
-                                              color: Colors.red,
-                                              fontWeight: FontWeight.bold
-                                          ),),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                  if(showCat)
+                    Wrap(
+                      spacing: 8,
+                      direction: Axis.horizontal,
+                      children: [
+                        for (int i=0; i< catList.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(left:10, right: 5),
+                            child: FilterChip(
+                              label: Text(catList[i]),
+                              labelStyle: TextStyle(color: Colors.white),
+                              backgroundColor: Colors.grey,
+                              selected: selected,
+                              onSelected: (bool value)
+                              {
+                                selected = value;
+                                setState(() {
 
-                              ),
+                                });
+
+                                getProductsByCategory(catList[i]);
+                              },
+
+                              selectedColor: Colors.green,
+                              showCheckmark: true,
 
                             ),
-                          ),
-                        );
-                      }),
-                )),
+                          )
+                      ],
+                    ),
+
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GridView.builder(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2),
+                          itemCount: prods.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                onTap: (){
+                                  Navigator.pushNamed(context, "/details",arguments: {'prod':prods[index]});
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(color: Colors.grey,width: 0.5),
+                                    borderRadius: BorderRadius.circular(10)
+                                  ),
+
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        height: 90,
+                                          width: 100,
+                                          child: Image.network(prods[index]['image'])),
+                                      SizedBox(
+                                        height: 40,
+                                        child: Text(prods[index]['title'],
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 3,
+                                        textAlign: TextAlign.center,),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+                                        child: Row(
+                                          children: [
+                                            Text(prods[index]['rating']['rate'].toString(),
+                                              textAlign: TextAlign.center,),
+                                            Spacer(),
+                                            Text('₹ '+prods[index]['price'].toString(),
+                                              textAlign: TextAlign.center,style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold
+                                              ),),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+
+                                  ),
+
+                                ),
+                              ),
+                            );
+                          }),
+                    )),
+
+
+
+
+                ],
+              ),
          );
   }
 }
+
+
+
 
