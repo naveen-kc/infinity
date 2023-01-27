@@ -158,6 +158,7 @@ void getProductsByCategory(String cat)async{
                           showCat=false;
                           prods=searched;
                           selectedCat='';
+                          searchController.text='';
 
                         });
                         _focus.unfocus();
@@ -197,7 +198,7 @@ void getProductsByCategory(String cat)async{
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                               ),
-                              backgroundColor: selectedCat.contains(catList[i])?Colors.greenAccent:Colors.grey,
+                              backgroundColor: selectedCat.trim()==catList[i]?Colors.greenAccent:Colors.grey,
                               padding: const EdgeInsets.all(8.0),
                               label: Text(
                                 catList[i],
