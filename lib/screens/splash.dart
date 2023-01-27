@@ -21,7 +21,7 @@ class _SplashState extends State<Splash> {
 
   void checkSession()async{
     SharedPreferences prefs=await SharedPreferences.getInstance();
-    if(prefs.getString("name")!=null){
+    if(prefs.getString("token")!=null){
       Future.delayed(const Duration(seconds: 2), () {
         Navigator.pop(context, true);
         Navigator.pushNamed(context, "/home");

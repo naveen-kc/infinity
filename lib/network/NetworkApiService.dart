@@ -41,12 +41,15 @@ class NetworkApiService extends BaseApiService {
     if (response.statusCode==200) {
 
       dynamic responseJson = jsonDecode(response.body);
+
       return responseJson;
 
     }
     else{
 
-      dynamic responseJson = jsonDecode(response.body);
+      dynamic responseJson = response.body;
+
+      log("resssss :"+responseJson);
       return responseJson;
     }
 

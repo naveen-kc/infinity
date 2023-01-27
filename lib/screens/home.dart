@@ -2,6 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:infinity/controllers/homeController.dart';
+import 'package:provider/provider.dart';
+
+import '../controllers/itemData.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -19,6 +22,7 @@ class _HomeState extends State<Home> {
   List catList = [];
   bool selected = false;
   bool showCat=false;
+  String selectedCat='';
 
   @override
   void initState() {
@@ -112,6 +116,8 @@ void getProductsByCategory(String cat)async{
 
   @override
   Widget build(BuildContext context) {
+    var itemInfo = Provider.of<ItemData>(context,listen: false);
+    //final myList = context.watch<ItemData>().selectedItem;
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -143,11 +149,22 @@ void getProductsByCategory(String cat)async{
               },
                   controller: searchController,
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                    contentPadding: EdgeInsets.fromLTRB(15, 5, 0, 0),
                     fillColor: Colors.white,
                       filled: true,
                       hintText: "Search",
-                      prefixIcon: Icon(Icons.search),
+                      suffixIcon: IconButton(onPressed: () {
+                        setState(() {
+                          showCat=false;
+                          prods=searched;
+                          selectedCat='';
+
+                        });
+                        _focus.unfocus();
+                        
+                      }, icon: Icon(Icons.cancel_outlined),
+                        
+                      ),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(25.0)))),
                 ),
@@ -176,22 +193,28 @@ void getProductsByCategory(String cat)async{
                           Padding(
                             padding: const EdgeInsets.only(left:10, right: 5),
                             child: FilterChip(
-                              label: Text(catList[i]),
-                              labelStyle: TextStyle(color: Colors.white),
-                              backgroundColor: Colors.grey,
-                              selected: selected,
-                              onSelected: (bool value)
-                              {
-                                selected = value;
+                              showCheckmark: false,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              backgroundColor: selectedCat.contains(catList[i])?Colors.greenAccent:Colors.grey,
+                              padding: const EdgeInsets.all(8.0),
+                              label: Text(
+                                catList[i],
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  height: 1.4,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black,
+                                ),
+                              ), onSelected: (value) {
                                 setState(() {
-
+                                  selectedCat=catList[i];
                                 });
 
-                                getProductsByCategory(catList[i]);
-                              },
+                                getProductsByCategory(selectedCat);
 
-                              selectedColor: Colors.green,
-                              showCheckmark: true,
+                            },
 
                             ),
                           )
@@ -206,54 +229,66 @@ void getProductsByCategory(String cat)async{
                               crossAxisCount: 2),
                           itemCount: prods.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GestureDetector(
-                                onTap: (){
-                                  Navigator.pushNamed(context, "/details",arguments: {'prod':prods[index]});
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(color: Colors.grey,width: 0.5),
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
+                            return  Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: GestureDetector(
+                                  onTap: (){
+                                    itemInfo.addItem(prods[index]);
 
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        height: 90,
-                                          width: 100,
-                                          child: Image.network(prods[index]['image'])),
-                                      SizedBox(
-                                        height: 40,
-                                        child: Text(prods[index]['title'],
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 3,
-                                        textAlign: TextAlign.center,),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
-                                        child: Row(
-                                          children: [
-                                            Text(prods[index]['rating']['rate'].toString(),
-                                              textAlign: TextAlign.center,),
-                                            Spacer(),
-                                            Text('₹ '+prods[index]['price'].toString(),
-                                              textAlign: TextAlign.center,style: TextStyle(
-                                                  color: Colors.red,
-                                                  fontWeight: FontWeight.bold
-                                              ),),
-                                          ],
+                                   // myList.addAll(prods[index]);
+
+                                    Navigator.pushNamed(context, "/details",/*arguments: {'prod':prods[index]}*/);
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(color: Colors.grey,width: 0.5),
+                                      borderRadius: BorderRadius.circular(10)
+                                    ),
+
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height: 100,
+                                            width: 100,
+                                            child: Image.network(prods[index]['image'],)),
+                                        SizedBox(
+                                          height: 45,
+                                          child: Text(prods[index]['title'],
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 3,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 14
+                                          ),),
                                         ),
-                                      )
-                                    ],
+                                        Padding(
+                                            padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+                                            child: Row(
+                                              children: [
+                                                Text(prods[index]['rating']['rate'].toString(),
+                                                  textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontSize: 14
+                                                    )),
+                                                Spacer(),
+                                                Text('₹ '+prods[index]['price'].toString(),
+                                                  textAlign: TextAlign.center,style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 14
+                                                  ),),
+                                              ],
+                                            ),
+                                          ),
+
+                                      ],
+
+                                    ),
 
                                   ),
-
                                 ),
-                              ),
                             );
                           }),
                     )),

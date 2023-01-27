@@ -15,6 +15,7 @@ class Cart extends StatefulWidget {
 class _CartState extends State<Cart> {
 
   List cartItems=[];
+  double amount=0.0;
 
   @override
   void initState() {
@@ -33,8 +34,27 @@ class _CartState extends State<Cart> {
       cartItems=carts;
     });
 
+    getTotal();
+
+
   }
 
+  void getTotal(){
+    amount=0.0;
+
+    for(var i in cartItems){
+
+      double temp=0.0;
+
+      temp =double.parse(i['price'].toString());
+
+      setState(() {
+        amount+=temp;
+      });
+
+    }
+
+  }
 
 
   void remove(String id)async{
@@ -46,7 +66,7 @@ class _CartState extends State<Cart> {
 
     var data= json.encode(cartItems);
    local.putCart(data);
-
+    getTotal();
   }
 
 
@@ -63,7 +83,15 @@ class _CartState extends State<Cart> {
       body: SafeArea(
         child: Stack(
           children: [
-            Padding(
+            cartItems.length==0?Center(
+              child: Text('No Items in your cart',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+
+                ),),
+            ):
+           Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 60),
                   child: ListView.builder(
                       padding: EdgeInsets.zero,
@@ -184,10 +212,13 @@ class _CartState extends State<Cart> {
 
             ),
 
+
+
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
                 height: 50,
+                width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: [
@@ -202,23 +233,47 @@ class _CartState extends State<Cart> {
                     )
                   ],
                 ),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 25),
-                    child: Text(
-                      'Rs. 8994',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold
+                child:  Row(
+                  children: [
+                    IconButton(onPressed: (){
+
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertBox(
+                              header: "Logout",
+                              description: "If you logout, all the items in the cart will be deleted. Still want to logout?",
+                              okay: () async{
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                prefs.clear();
+                                Navigator.popUntil(context, (route) => route.settings.name == '/splash');
+                                Navigator.pushNamed(context, "/login");
+                              },
+                              yes: 'Logout',
+                            );
+                          });
+
+                    }, icon: Icon(Icons.logout)),
+                    Spacer(),
+                    Padding(
+                        padding: const EdgeInsets.only(right: 25),
+                        child: Text(
+                          '₹ '+amount.toString(),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
+                  ],
                 ),
 
+
               ),
-            )
+            ),
+
           ],
         ),
       ),

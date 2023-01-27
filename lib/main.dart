@@ -4,10 +4,16 @@ import 'package:infinity/screens/details.dart';
 import 'package:infinity/screens/home.dart';
 import 'package:infinity/screens/splash.dart';
 import 'package:infinity/screens/login.dart';
+import 'package:provider/provider.dart';
+
+import 'controllers/itemData.dart';
 
 void main() {
 
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider<ItemData>(
+    child: const MyApp(),
+    create: (_) => ItemData(), // Create a new ChangeNotifier object
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -24,8 +30,6 @@ class MyApp extends StatelessWidget {
         '/cart': (context) => Cart(),
         '/details': (context) => Details(),
         '/login':(context)=>Login()
-
-
       },
     );
   }

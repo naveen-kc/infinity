@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:infinity/helpers/localStorage.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../controllers/itemData.dart';
 
 
 class Details extends StatefulWidget {
@@ -13,10 +16,9 @@ class Details extends StatefulWidget {
 }
 
 class _DetailsState extends State<Details> {
-  Map product={};
 
 
-  void addToCart()async{
+  void addToCart(Map product)async{
 
     LocalStorage local= LocalStorage();
     List items=[];
@@ -31,26 +33,35 @@ class _DetailsState extends State<Details> {
     else if(data!.isNotEmpty){
       var check=json.decode(data);
       items=check;
+
+      for(var i in items){
+        if(i['id']==product['id']){
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                  'This item is already exist in cart')));
+          return;
+        }
+      }
       items.add(product);
       var s = json.encode(items);
       local.putCart(s);
 
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green,
+          content: Text(
+              'Added to cart successfully')));
+
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.green,
-        content: Text(
-            'Added to cart successfully')));
-
   }
 
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map;
+    /*final args = ModalRoute.of(context)!.settings.arguments as Map;
     setState(() {
       product = args['prod'];
-    });
+    });*/
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -82,7 +93,8 @@ class _DetailsState extends State<Details> {
         ],
       ),
       body:SafeArea(
-      child:Stack(
+      child:Consumer<ItemData>(builder: (context, data,child) {
+        return Stack(
         children: [
           SingleChildScrollView(
             child: Column(
@@ -98,7 +110,8 @@ class _DetailsState extends State<Details> {
                         border: Border.all(color: Colors.grey,width: 1),
                         borderRadius: BorderRadius.circular(10)
                       ),
-                      child: Image.network(product['image']),
+                      child:   Image.network(data.selectedItem['image']),
+
                     ),
                   ),
                 ),
@@ -107,7 +120,7 @@ class _DetailsState extends State<Details> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text(product['title'],
+                        child: Text(data.selectedItem['title'],
                             style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -117,14 +130,14 @@ class _DetailsState extends State<Details> {
                       Spacer(),
                       Column(
                         children: [
-                          Text('₹ '+product['price'].toString(),
+                          Text('₹ '+data.selectedItem['price'].toString(),
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 25
                           ),),
 
-                          Text('Rating: '+product['rating']['rate'].toString()+'/5',
+                          Text('Rating: '+data.selectedItem['rating']['rate'].toString()+'/5',
                             style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -141,7 +154,7 @@ class _DetailsState extends State<Details> {
                 SizedBox(height: 30,),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                  child: Text(product['description'],
+                  child: Text(data.selectedItem['description'],
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
@@ -150,7 +163,7 @@ class _DetailsState extends State<Details> {
                       )),
                 ),
               ],
-            ),
+            )
 
           ),
 
@@ -182,7 +195,7 @@ class _DetailsState extends State<Details> {
                           textStyle: MaterialStateProperty.all(
                               const TextStyle(fontSize: 14, color: Colors.white))),
                       onPressed: ()async{
-                       addToCart();
+                       addToCart(data.selectedItem);
 
                       },
                       child: const Text('Add to Cart')),
@@ -192,7 +205,8 @@ class _DetailsState extends State<Details> {
             ),
           )
         ],
-      ),
+      );
+      },),
       )
     );
   }
