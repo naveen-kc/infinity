@@ -17,9 +17,8 @@ class Details extends StatefulWidget {
 
 class _DetailsState extends State<Details> {
 
-
+// Adding item to cart also checking the item is already exist in cart
   void addToCart(Map product)async{
-
     LocalStorage local= LocalStorage();
     List items=[];
 
@@ -42,11 +41,12 @@ class _DetailsState extends State<Details> {
                   'This item is already exist in cart')));
           return;
         }
+
       }
+
       items.add(product);
       var s = json.encode(items);
       local.putCart(s);
-
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.green,
           content: Text(

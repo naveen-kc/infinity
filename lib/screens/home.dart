@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:infinity/controllers/homeController.dart';
+import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/itemData.dart';
@@ -23,19 +24,18 @@ class _HomeState extends State<Home> {
   bool selected = false;
   bool showCat=false;
   String selectedCat='';
+  bool loader=false;
 
   @override
   void initState() {
     getProducts();
     _focus.addListener(_onFocusChange);
-
     super.initState();
   }
 
+  //To get the user action on textfield and also changing ui based on the requirement
   void _onFocusChange() async{
   debugPrint("Focus: ${_focus.hasFocus.toString()}");
-
-
   if(_focus.hasFocus){
     var data = await Controller().getCategories();
     setState(() {
@@ -49,15 +49,12 @@ class _HomeState extends State<Home> {
   }
 }
 
+//To get the products by category
 void getProductsByCategory(String cat)async{
-
   setState(() {
     loading=true;
   });
   var data = await Controller().getByType(cat);
-
-  log("respoooooooo :" + data.toString());
-
   setState(() {
     prods = data;
   });
@@ -68,14 +65,12 @@ void getProductsByCategory(String cat)async{
 }
 
 
-
+//To get the products
   void getProducts() async {
     setState(() {
       loading=true;
     });
-    var data = await Controller().getProducts();
-
-    log("respo :" + data.toString());
+    var data = await Controller().getProducts(context);
 
     setState(() {
       prods = data;
@@ -87,6 +82,27 @@ void getProductsByCategory(String cat)async{
     });
   }
 
+//To get more products when scrolled down
+  void loadMore(BuildContext context)async{
+    var itemInfo = Provider.of<ItemData>(context,listen: false);
+    itemInfo.increaseLimit();
+    setState(() {
+      loader=true;
+    });
+    var data = await Controller().getProducts(context);
+
+    setState(() {
+      prods = data;
+      searched=data;
+    });
+
+    setState(() {
+      loader=false;
+    });
+  }
+
+
+  //To filter the items based on the entered key in textfield
   void filterSearchResults(String query) {
       List results = [];
       if (query.isEmpty) {
@@ -184,7 +200,6 @@ void getProductsByCategory(String cat)async{
                     strokeWidth: 5.0))):
               Column(
                 children: [
-
                   if(showCat)
                     Wrap(
                       spacing: 8,
@@ -212,90 +227,98 @@ void getProductsByCategory(String cat)async{
                                 setState(() {
                                   selectedCat=catList[i];
                                 });
-
                                 getProductsByCategory(selectedCat);
-
                             },
-
                             ),
                           )
                       ],
                     ),
 
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GridView.builder(
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2),
-                          itemCount: prods.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return  Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: GestureDetector(
-                                  onTap: (){
-                                    itemInfo.addItem(prods[index]);
+                    child: LazyLoadScrollView(
+                       isLoading: loader,
+                        onEndOfPage: () => loadMore(context),
+                        child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
+                            itemCount: prods.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return  Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                    onTap: (){
+                                      itemInfo.addItem(prods[index]);
+                                     // myList.addAll(prods[index]);
+                                      Navigator.pushNamed(context, "/details",/*arguments: {'prod':prods[index]}*/);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border.all(color: Colors.grey,width: 0.5),
+                                        borderRadius: BorderRadius.circular(10)
+                                      ),
 
-                                   // myList.addAll(prods[index]);
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(height: 5,),
+                                           Image.network(prods[index]['image'],
+                                              height: 80,),
+                                         Padding(
+                                           padding: const EdgeInsets.all(4.0),
+                                           child:  Text(prods[index]['title'],
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 14
+                                              ),),
+                                           ),
 
-                                    Navigator.pushNamed(context, "/details",/*arguments: {'prod':prods[index]}*/);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(color: Colors.grey,width: 0.5),
-                                      borderRadius: BorderRadius.circular(10)
-                                    ),
-
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          height: 100,
-                                            width: 100,
-                                            child: Image.network(prods[index]['image'],)),
-                                        SizedBox(
-                                          height: 45,
-                                          child: Text(prods[index]['title'],
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 3,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 14
-                                          ),),
-                                        ),
-                                        Padding(
-                                            padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
-                                            child: Row(
-                                              children: [
-                                                Text(prods[index]['rating']['rate'].toString(),
-                                                  textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        fontSize: 14
-                                                    )),
-                                                Spacer(),
-                                                Text('₹ '+prods[index]['price'].toString(),
-                                                  textAlign: TextAlign.center,style: TextStyle(
-                                                      color: Colors.red,
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 14
-                                                  ),),
-                                              ],
-                                            ),
+                                          Expanded(
+                                            child: Padding(
+                                                padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+                                                child: Row(
+                                                  children: [
+                                                    Text(prods[index]['rating']['rate'].toString(),
+                                                      textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                            fontSize: 14
+                                                        )),
+                                                    Spacer(),
+                                                    Text('₹ '+prods[index]['price'].toString(),
+                                                      textAlign: TextAlign.center,style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 14
+                                                      ),),
+                                                  ],
+                                                ),
+                                              ),
                                           ),
-
-                                      ],
-
+                                        ],
+                                      ),
                                     ),
-
                                   ),
-                                ),
-                            );
-                          }),
-                    )),
-
-
-
+                              );
+                            }),
+                      )),
+                  ),
+                  if(loader)
+                    SizedBox(
+                      height: 60,
+                      child: Center(
+                          child: SizedBox(
+                              height: 30.0,
+                              width: 30.0,
+                              child:
+                              CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation(
+                                      Colors.green),
+                                  strokeWidth: 2.0))),
+                    )
 
                 ],
               ),

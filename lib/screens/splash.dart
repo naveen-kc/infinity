@@ -12,13 +12,12 @@ class _SplashState extends State<Splash> {
 
   @override
   void initState() {
-
     checkSession();
-
     super.initState();
   }
 
 
+  //Checking the Session and moving to respected screens
   void checkSession()async{
     SharedPreferences prefs=await SharedPreferences.getInstance();
     if(prefs.getString("token")!=null){
@@ -32,7 +31,6 @@ class _SplashState extends State<Splash> {
         Navigator.pushNamed(context, "/login");
       });
     }
-
 
   }
 

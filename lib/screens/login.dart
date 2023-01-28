@@ -16,18 +16,15 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+
   TextEditingController nameController = TextEditingController();
   TextEditingController passController=TextEditingController();
   bool loading=false;
 
-
-
+  //Login button integration and storing token for session management
   void login()async{
     setState(()=>loading=true);
     var data= await LoginController().login(nameController.text, passController.text);
-
-    log("datatta:"+data.toString());
-
         if(data is String){
           setState(()=>loading=false);
           showDialog(
@@ -40,9 +37,6 @@ class _LoginState extends State<Login> {
 
                 );
               });
-
-
-
         }else{
           setState(()=>loading=false);
           LocalStorage local=LocalStorage();
@@ -124,12 +118,8 @@ class _LoginState extends State<Login> {
                             content: Text(
                                 'Please enter both the fields')));
                       }else{
-
                         login();
-
-
                       }
-
                     },
                     child: Container(
                       height: 50,
@@ -149,8 +139,6 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 )
-
-
               ],
             ),
           ),

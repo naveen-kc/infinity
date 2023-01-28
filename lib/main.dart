@@ -19,6 +19,8 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+
+  //Setting the navigation screens
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

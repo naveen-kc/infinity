@@ -4,14 +4,16 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'BaseApiService.dart';
 
+
+//Different Methods for API.method
 class NetworkApiService extends BaseApiService {
   @override
   Future getResponse(String url) async {
     url;
     dynamic responseJson;
+    log("$url");
     try {
       final response = await http.get(Uri.parse(url));
-      log("$url");
       responseJson = returnResponse(response);
     } on SocketException {
       throw Exception('No Internet Connection');
@@ -24,8 +26,6 @@ class NetworkApiService extends BaseApiService {
       String baseUrl, String url, Map<String, dynamic> JsonBody) async {
     dynamic responseJson;
     log("$baseUrl$url$JsonBody");
-
-
     try {
       final response =
       await http.post(Uri.parse(baseUrl + url), body: JsonBody);
@@ -46,10 +46,7 @@ class NetworkApiService extends BaseApiService {
 
     }
     else{
-
       dynamic responseJson = response.body;
-
-      log("resssss :"+responseJson);
       return responseJson;
     }
 

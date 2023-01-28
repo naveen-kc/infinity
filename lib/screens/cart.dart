@@ -24,6 +24,8 @@ class _CartState extends State<Cart> {
     super.initState();
   }
 
+
+  //To get the Cart items from local storage and decoding it into list for showing
   void getCart() async{
     SharedPreferences prefs=await SharedPreferences.getInstance();
     prefs.getString('cart');
@@ -33,12 +35,12 @@ class _CartState extends State<Cart> {
     setState(() {
       cartItems=carts;
     });
-
     getTotal();
-
 
   }
 
+
+  //To get the total amount of all the cart items
   void getTotal(){
     amount=0.0;
 
@@ -56,7 +58,7 @@ class _CartState extends State<Cart> {
 
   }
 
-
+//To remove from the cart
   void remove(String id)async{
     LocalStorage local= LocalStorage();
 
@@ -68,7 +70,6 @@ class _CartState extends State<Cart> {
    local.putCart(data);
     getTotal();
   }
-
 
 
 
@@ -236,7 +237,6 @@ class _CartState extends State<Cart> {
                 child:  Row(
                   children: [
                     IconButton(onPressed: (){
-
                       showDialog(
                           context: context,
                           barrierDismissible: false,

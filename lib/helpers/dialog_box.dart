@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 
-
+//Showing popup message or directions to the users
 class AppDialog extends StatefulWidget {
   String header;
   String description;
@@ -52,7 +52,6 @@ class _AppDialogState extends State<AppDialog> {
                 child: Text(
                   widget.header,
                   style: TextStyle(
-
                       fontSize: 20.0,
                       color: Colors.black),
                 ),

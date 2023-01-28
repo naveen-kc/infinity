@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 
-
+//This is to show alert to the users
 class AlertBox extends StatefulWidget {
   String header;
   String description;
@@ -56,7 +56,6 @@ class _AppDialogState extends State<AlertBox> {
                 child: Text(
                   widget.header,
                   style: TextStyle(
-                      fontFamily: 'OpenMedium',
                       fontSize: 20.0,
                       color: Colors.black),
                 ),
@@ -71,7 +70,6 @@ class _AppDialogState extends State<AlertBox> {
                     widget.value!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontFamily: 'OpenBold',
                         fontSize: 30.0,
                         color: Colors.black),
                   ),
@@ -82,7 +80,6 @@ class _AppDialogState extends State<AlertBox> {
                 child: Text(
                   widget.description,
                   style: TextStyle(
-                      fontFamily: 'OpenRegular',
                       fontSize: 16.0,
                       color: Colors.grey),
                 ),
@@ -134,6 +131,8 @@ class _AppDialogState extends State<AlertBox> {
     ]);
   }
 
+
+  //We can handle the stack if we want
   void handleStack(String route) {
     Navigator.pop(context, true);
     Navigator.pushNamed(context, route);
