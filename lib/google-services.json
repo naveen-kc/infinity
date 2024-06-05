@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "769671655197",
+    "project_id": "spannerdoor-mobile-app",
+    "storage_bucket": "spannerdoor-mobile-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:769671655197:android:ced4bf109b122050b1fbf4",
+        "android_client_info": {
+          "package_name": "com.spannerdoor.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY3Bwpg8f3qpwUP1w0FWlBRJnJrq4hzHg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
